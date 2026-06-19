@@ -1,12 +1,29 @@
 # Dowsing · 失物占
 
-<div align="center">
+> **AI Agent Skill** — Lost-item search powered by [Meihua Yishu](https://en.wikipedia.org/wiki/Plum_Blossom_Yijing) (梅花易数). Works with **Claude Code**, **Cursor**, **ChatGPT** & **Gemini**.
 
-**A structured search heuristic powered by Meihua Yishu (Plum Blossom Yi-ology) — not magic, but a systematic way to break through search blind spots.**
+[Agent Skill](https://github.com/anthropics/skills)
+[Claude Code]()
+[Cursor Skill]()
+[License: MIT](https://opensource.org/licenses/MIT)
+
+**A structured search heuristic — not magic, but a systematic way to break through search blind spots.**
 
 **梅花易数失物占 · 结构化搜索启发器 — 帮你打破搜寻盲区，而非预定命运。**
 
-</div>
+## Quick Install · 一键安装
+
+```bash
+# Claude Code
+git clone https://github.com/raphaelxie/dowsing.git ~/.claude/skills/dowsing
+
+# Cursor
+git clone https://github.com/raphaelxie/dowsing.git ~/.cursor/skills/dowsing
+```
+
+Or in Claude Code: `Please install this skill: https://github.com/raphaelxie/dowsing`
+
+**Triggers:** `失物占` · `找东西` · `lost item` · `I lost my passport` · `我的 XX 丢了`
 
 ---
 
@@ -46,14 +63,14 @@ Once installed, trigger phrases like "我的护照丢了" (I lost my passport), 
 
 #### As a ChatGPT Custom GPT
 
-1. Go to https://chatgpt.com/gpts/editor and create a new GPT
+1. Go to [https://chatgpt.com/gpts/editor](https://chatgpt.com/gpts/editor) and create a new GPT
 2. Copy the full text of `SKILL.md` into **Instructions** (must be < 8000 characters)
 3. Upload all files under `references/` as **Knowledge**
 4. Suggested conversation starters: "我的东西丢了，帮我占一卦" / "失物占"
 
 #### As a Google Gemini Gem
 
-1. Go to https://gemini.google.com/gems and create a new Gem
+1. Go to [https://gemini.google.com/gems](https://gemini.google.com/gems) and create a new Gem
 2. Copy `SKILL.md` into Instructions
 3. Upload `references/` as Knowledge files
 4. Suggested prompts: "失物占" / "帮我找丢失的东西"
@@ -81,53 +98,26 @@ The script outputs a structured JSON **SearchReport** containing `primary_direct
 
 ### Context Values
 
-| Value | Label | When to Use |
-|-------|-------|-------------|
-| `home` | 居家 | Item lost at home |
-| `public` | 公共场所/户外 | Item lost in a library, office, mall, street, etc. |
-| `transit` | 交通工具 | Item lost on a plane, bus, train, car, etc. |
-| `pet` | 走失生物 | A lost cat, dog, or other pet |
-| `general` | 通用 | Unknown context — direction-only interpretation (default) |
+
+| Value     | Label   | When to Use                                               |
+| --------- | ------- | --------------------------------------------------------- |
+| `home`    | 居家      | Item lost at home                                         |
+| `public`  | 公共场所/户外 | Item lost in a library, office, mall, street, etc.        |
+| `transit` | 交通工具    | Item lost on a plane, bus, train, car, etc.               |
+| `pet`     | 走失生物    | A lost cat, dog, or other pet                             |
+| `general` | 通用      | Unknown context — direction-only interpretation (default) |
+
 
 ### How It Works
 
-```
-┌───────────────────────────────────────────────────────┐
-│                    Input                              │
-│  Time / Date / Numbers  +  Item name  +  Context      │
-└──────────────────────┬────────────────────────────────┘
-                      ▼
-┌───────────────────────────────────────────────────────┐
-│             shiwu_calc.py (Deterministic)             │
-│                                                       │
-│  1. Cast hexagram (本卦) from input                   │
-│  2. Determine Ti (体 = seeker) & Yong (用 = item)     │
-│  3. Analyze Five Elements (五行) relationship         │
-│  4. Compute mutual hexagram (互卦) — transition path  │
-│  5. Compute transformed hexagram (变卦) — movement    │
-│  6. Extract directions + context-aware scenes         │
-│  7. Compute combined directions (e.g. 南+西=西南)     │
-│  8. Generate findability assessment                   │
-│  9. Build action advice                               │
-└──────────────────────┬────────────────────────────────┘
-                      ▼
-┌───────────────────────────────────────────────────────┐
-│               SearchReport (JSON)                     │
-│                                                       │
-│  • primary_direction  — cardinal bearing to search    │
-│  • locations[]        — ranked search zones           │
-│  • findability        — tendency + reasoning          │
-│  • moved              — movement inference            │
-│  • action_advice      — concrete next steps           │
-└──────────────────────┬────────────────────────────────┘
-                      ▼
-┌───────────────────────────────────────────────────────┐
-│            LLM (Claude / ChatGPT / Gemini)            │
-│                                                       │
-│  Renders the JSON into a human-readable search        │
-│  report using reference materials for qualitative     │
-│  interpretation.                                      │
-└───────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    input["Input<br/>Time / Date / Numbers + Item name + Context"]
+    calc["shiwu_calc.py (Deterministic)<br/>1. Cast hexagram (本卦) from input<br/>2. Determine Ti (体 = seeker) & Yong (用 = item)<br/>3. Analyze Five Elements (五行) relationship<br/>4. Compute mutual hexagram (互卦) — transition path<br/>5. Compute transformed hexagram (变卦) — movement<br/>6. Extract directions + context-aware scenes<br/>7. Compute combined directions (e.g. 南+西=西南)<br/>8. Generate findability assessment<br/>9. Build action advice"]
+    report["SearchReport (JSON)<br/>• primary_direction — cardinal bearing to search<br/>• locations[] — ranked search zones<br/>• findability — tendency + reasoning<br/>• moved — movement inference<br/>• action_advice — concrete next steps"]
+    llm["LLM (Claude / ChatGPT / Gemini)<br/>Renders JSON into a human-readable search report<br/>using reference materials for qualitative interpretation"]
+
+    input --> calc --> report --> llm
 ```
 
 ### Project Structure
@@ -149,26 +139,30 @@ dowsing/
 
 ### The Eight Trigrams (Bagua) at a Glance
 
-| # | Name | Symbol | Element | Direction | Key Traits |
-|---|------|--------|---------|-----------|------------|
-| 1 | 乾 Qián | ☰ | Metal (金) | NW 西北 | Round, metallic, high places |
-| 2 | 兌 Duì | ☱ | Metal (金) | W 西 | Gaps, small metal items, dining areas |
-| 3 | 離 Lí | ☲ | Fire (火) | S 南 | Bright, documents, electronics |
-| 4 | 震 Zhèn | ☳ | Wood (木) | E 东 | Wood, movement, noisy areas |
-| 5 | 巽 Xùn | ☴ | Wood (木) | SE 东南 | Fabric, gaps, crevices, vents |
-| 6 | 坎 Kǎn | ☵ | Water (水) | N 北 | Water, hidden recesses, washing |
-| 7 | 艮 Gèn | ☶ | Earth (土) | NE 东北 | Corners, still places, thresholds |
-| 8 | 坤 Kūn | ☷ | Earth (土) | SW 西南 | Low places, fabric, bags, pockets |
+
+| #   | Name   | Symbol | Element   | Direction | Key Traits                            |
+| --- | ------ | ------ | --------- | --------- | ------------------------------------- |
+| 1   | 乾 Qián | ☰      | Metal (金) | NW 西北     | Round, metallic, high places          |
+| 2   | 兌 Duì  | ☱      | Metal (金) | W 西       | Gaps, small metal items, dining areas |
+| 3   | 離 Lí   | ☲      | Fire (火)  | S 南       | Bright, documents, electronics        |
+| 4   | 震 Zhèn | ☳      | Wood (木)  | E 东       | Wood, movement, noisy areas           |
+| 5   | 巽 Xùn  | ☴      | Wood (木)  | SE 东南     | Fabric, gaps, crevices, vents         |
+| 6   | 坎 Kǎn  | ☵      | Water (水) | N 北       | Water, hidden recesses, washing       |
+| 7   | 艮 Gèn  | ☶      | Earth (土) | NE 东北     | Corners, still places, thresholds     |
+| 8   | 坤 Kūn  | ☷      | Earth (土) | SW 西南     | Low places, fabric, bags, pockets     |
+
 
 ### Findability (Ti-Yong Analysis)
 
-| Relationship | Tendency | Distance | Meaning |
-|-------------|----------|----------|---------|
-| 用生体 Yong → Ti | Easy (易得) | Near | Item "comes to you"; likely nearby |
-| 体用比和 Harmony | Easy (易得) | Near | Same element; near original spot |
-| 体克用 Ti → Yong | Possible (可得) | Medium | Requires effort but recoverable |
-| 用克体 Yong → Ti | Difficult (难寻) | Far | May have left your possession |
-| 体生用 Ti → Yong | Hard (难得) | Far | Draining; unlikely to recover |
+
+| Relationship  | Tendency       | Distance | Meaning                            |
+| ------------- | -------------- | -------- | ---------------------------------- |
+| 用生体 Yong → Ti | Easy (易得)      | Near     | Item "comes to you"; likely nearby |
+| 体用比和 Harmony  | Easy (易得)      | Near     | Same element; near original spot   |
+| 体克用 Ti → Yong | Possible (可得)  | Medium   | Requires effort but recoverable    |
+| 用克体 Yong → Ti | Difficult (难寻) | Far      | May have left your possession      |
+| 体生用 Ti → Yong | Hard (难得)      | Far      | Draining; unlikely to recover      |
+
 
 ### Running Tests
 
@@ -180,13 +174,15 @@ pytest tests/ -v
 
 ### Verified Cases
 
-| Case | Context | Key Insight |
-|------|---------|-------------|
-| Gold bracelet → washing machine | Home | Kan hexagram (坎 ☵) = "in water" → found in washing machine |
-| Charging cable at library | Public | Gen hexagram (艮 ☶) = "lost & found" in public context |
-| Power bank on airplane | Transit | Context matters — transit scenes differ from home |
-| SIM card in bag pocket | Home | Combined direction: Li (S) + Dui (W) = SW (Kun), found in SW pocket |
-| Lost cat | Pet | Direction + animal imagery + self-return analysis |
+
+| Case                            | Context | Key Insight                                                         |
+| ------------------------------- | ------- | ------------------------------------------------------------------- |
+| Gold bracelet → washing machine | Home    | Kan hexagram (坎 ☵) = "in water" → found in washing machine          |
+| Charging cable at library       | Public  | Gen hexagram (艮 ☶) = "lost & found" in public context               |
+| Power bank on airplane          | Transit | Context matters — transit scenes differ from home                   |
+| SIM card in bag pocket          | Home    | Combined direction: Li (S) + Dui (W) = SW (Kun), found in SW pocket |
+| Lost cat                        | Pet     | Direction + animal imagery + self-return analysis                   |
+
 
 See `references/cases.md` for full details.
 
@@ -210,6 +206,7 @@ See `references/cases.md` for full details.
 ### Contributing
 
 Contributions are welcome — especially:
+
 - New verified case studies with ground truth
 - Improved context-dependent imagery (scene suggestions)
 - Language translations of reference materials
@@ -257,14 +254,14 @@ git clone https://github.com/raphaelxie/dowsing.git ~/.claude/skills/dowsing
 
 #### 作为 ChatGPT Custom GPT
 
-1. 前往 https://chatgpt.com/gpts/editor 创建新 GPT
+1. 前往 [https://chatgpt.com/gpts/editor](https://chatgpt.com/gpts/editor) 创建新 GPT
 2. 将 `SKILL.md` 全文复制到 **Instructions**（需 < 8000 字符）
 3. 上传 `references/` 下全部文件为 **Knowledge**
 4. 建议对话开场白：「我的东西丢了，帮我占一卦」「失物占」
 
 #### 作为 Google Gemini Gem
 
-1. 前往 https://gemini.google.com/gems 创建新 Gem
+1. 前往 [https://gemini.google.com/gems](https://gemini.google.com/gems) 创建新 Gem
 2. 将 `SKILL.md` 复制到 Instructions
 3. 上传 `references/` 为 Knowledge 文件
 4. 建议提示：「失物占」「帮我找丢失的东西」
@@ -292,52 +289,26 @@ python scripts/shiwu_calc.py time --item 猫 --context pet
 
 ### 语境取值
 
-| 值 | 中文标签 | 适用场景 |
-|----|----------|----------|
-| `home` | 居家 | 在家中丢失 |
-| `public` | 公共场所/户外 | 图书馆、学校、办公室、商场、街道等 |
-| `transit` | 交通工具 | 飞机、大巴、火车、汽车、地铁等 |
-| `pet` | 走失生物 | 走失的猫、狗等宠物 |
-| `general` | 通用 | 不确定语境时的默认值，侧重方位 |
+
+| 值         | 中文标签    | 适用场景              |
+| --------- | ------- | ----------------- |
+| `home`    | 居家      | 在家中丢失             |
+| `public`  | 公共场所/户外 | 图书馆、学校、办公室、商场、街道等 |
+| `transit` | 交通工具    | 飞机、大巴、火车、汽车、地铁等   |
+| `pet`     | 走失生物    | 走失的猫、狗等宠物         |
+| `general` | 通用      | 不确定语境时的默认值，侧重方位   |
+
 
 ### 工作原理
 
-```
-┌──────────────────────────────────────────────────────────┐
-│                    输入                                  │
-│   时间/日期/数字  +  物品名  +  语境                     │
-└──────────────────────┬───────────────────────────────────┘
-                      ▼
-┌──────────────────────────────────────────────────────────┐
-│            shiwu_calc.py（确定性引擎）                   │
-│                                                          │
-│  1. 据输入起本卦                                         │
-│  2. 定体（失主）用（失物）                               │
-│  3. 分析五行生克关系                                     │
-│  4. 推互卦 — 中间经过路径                                │
-│  5. 推变卦 — 是否移动                                    │
-│  6. 提取方位 + 依语境取场景类象                          │
-│  7. 计算复合方向（如南+西=西南）                         │
-│  8. 生成寻回倾向判断                                     │
-│  9. 构建行动建议                                         │
-└──────────────────────┬───────────────────────────────────┘
-                      ▼
-┌──────────────────────────────────────────────────────────┐
-│               SearchReport (JSON)                        │
-│                                                          │
-│  • primary_direction  — 首要搜索方位                     │
-│  • locations[]        — 排序搜索区域                     │
-│  • findability        — 倾向 + 理由                      │
-│  • moved              — 移动推断                         │
-│  • action_advice      — 具体行动建议                     │
-└──────────────────────┬───────────────────────────────────┘
-                      ▼
-┌──────────────────────────────────────────────────────────┐
-│           LLM（Claude / ChatGPT / Gemini）               │
-│                                                          │
-│  将 JSON 渲染为用户可读的搜寻报告，结合 references/      │
-│  中的资料进行定性解读。                                  │
-└──────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    input["输入<br/>时间/日期/数字 + 物品名 + 语境"]
+    calc["shiwu_calc.py（确定性引擎）<br/>1. 据输入起本卦<br/>2. 定体（失主）用（失物）<br/>3. 分析五行生克关系<br/>4. 推互卦 — 中间经过路径<br/>5. 推变卦 — 是否移动<br/>6. 提取方位 + 依语境取场景类象<br/>7. 计算复合方向（如南+西=西南）<br/>8. 生成寻回倾向判断<br/>9. 构建行动建议"]
+    report["SearchReport (JSON)<br/>• primary_direction — 首要搜索方位<br/>• locations[] — 排序搜索区域<br/>• findability — 倾向 + 理由<br/>• moved — 移动推断<br/>• action_advice — 具体行动建议"]
+    llm["LLM（Claude / ChatGPT / Gemini）<br/>将 JSON 渲染为用户可读的搜寻报告<br/>结合 references/ 中的资料进行定性解读"]
+
+    input --> calc --> report --> llm
 ```
 
 ### 项目结构
@@ -359,26 +330,30 @@ dowsing/
 
 ### 八卦速览
 
-| 卦序 | 卦名 | 符号 | 五行 | 后天方位 | 关键特征 |
-|------|------|------|------|----------|----------|
-| 1 | 乾 | ☰ | 金 | 西北 | 圆形、金属、高处 |
-| 2 | 兑 | ☱ | 金 | 西 | 缺口、小金属器具、饮食处 |
-| 3 | 离 | ☲ | 火 | 南 | 明亮、文书、电器 |
-| 4 | 震 | ☳ | 木 | 东 | 木器、动处、喧闹处 |
-| 5 | 巽 | ☴ | 木 | 东南 | 柔软织物、缝隙、通风口 |
-| 6 | 坎 | ☵ | 水 | 北 | 近水、隐蔽暗格、洗涤处 |
-| 7 | 艮 | ☶ | 土 | 东北 | 角落、静止处、门径台阶 |
-| 8 | 坤 | ☷ | 土 | 西南 | 低处、布料、包内、口袋 |
+
+| 卦序  | 卦名  | 符号  | 五行  | 后天方位 | 关键特征         |
+| --- | --- | --- | --- | ---- | ------------ |
+| 1   | 乾   | ☰   | 金   | 西北   | 圆形、金属、高处     |
+| 2   | 兑   | ☱   | 金   | 西    | 缺口、小金属器具、饮食处 |
+| 3   | 离   | ☲   | 火   | 南    | 明亮、文书、电器     |
+| 4   | 震   | ☳   | 木   | 东    | 木器、动处、喧闹处    |
+| 5   | 巽   | ☴   | 木   | 东南   | 柔软织物、缝隙、通风口  |
+| 6   | 坎   | ☵   | 水   | 北    | 近水、隐蔽暗格、洗涤处  |
+| 7   | 艮   | ☶   | 土   | 东北   | 角落、静止处、门径台阶  |
+| 8   | 坤   | ☷   | 土   | 西南   | 低处、布料、包内、口袋  |
+
 
 ### 能否找回（体用生克）
 
-| 生克关系 | 倾向 | 距离 | 说明 |
-|----------|------|------|------|
-| 用生体 | 易得 | 近 | 失物「自来」，多在近处 |
-| 体用比和 | 易得 | 近 | 同气相求，原处附近 |
-| 体克用 | 可得 | 中 | 需主动寻找，费力但能找回 |
-| 用克体 | 难寻 | 远 | 恐已离身或被他人取走 |
-| 体生用 | 难得 | 远 | 耗神费力，多半难找回 |
+
+| 生克关系 | 倾向  | 距离  | 说明           |
+| ---- | --- | --- | ------------ |
+| 用生体  | 易得  | 近   | 失物「自来」，多在近处  |
+| 体用比和 | 易得  | 近   | 同气相求，原处附近    |
+| 体克用  | 可得  | 中   | 需主动寻找，费力但能找回 |
+| 用克体  | 难寻  | 远   | 恐已离身或被他人取走   |
+| 体生用  | 难得  | 远   | 耗神费力，多半难找回   |
+
 
 ### 运行测试
 
@@ -390,13 +365,15 @@ pytest tests/ -v
 
 ### 验证案例
 
-| 案例 | 语境 | 关键启示 |
-|------|------|----------|
-| 金手链 → 洗衣机 | 居家 | 坎卦（☵）=「在水里」→ 在洗衣机中找到 |
-| 充电线在图书馆 | 公共 | 艮卦（☶）= 公共场所对应「失物招领处」 |
-| 充电宝落飞机 | 交通 | 语境决定取象——交通工具场景完全不同于居家 |
-| SIM卡在包内夹层 | 居家 | 复合方向：离（南）+ 兑（西）= 西南（坤），在西南方包内寻得 |
-| 走失猫咪 | 宠物 | 方位 + 动物类象 + 是否自归分析 |
+
+| 案例        | 语境  | 关键启示                            |
+| --------- | --- | ------------------------------- |
+| 金手链 → 洗衣机 | 居家  | 坎卦（☵）=「在水里」→ 在洗衣机中找到            |
+| 充电线在图书馆   | 公共  | 艮卦（☶）= 公共场所对应「失物招领处」            |
+| 充电宝落飞机    | 交通  | 语境决定取象——交通工具场景完全不同于居家           |
+| SIM卡在包内夹层 | 居家  | 复合方向：离（南）+ 兑（西）= 西南（坤），在西南方包内寻得 |
+| 走失猫咪      | 宠物  | 方位 + 动物类象 + 是否自归分析              |
+
 
 详见 `references/cases.md`。
 
@@ -420,6 +397,7 @@ pytest tests/ -v
 ### 参与贡献
 
 欢迎贡献，尤其需要：
+
 - 有 ground truth 的新验证案例
 - 改进各语境下的类象场景
 - 参考资料的各语言翻译
@@ -431,7 +409,7 @@ pytest tests/ -v
 
 ---
 
-<div align="center">
+
 
 **「穷则变，变则通，通则久。」**
 
@@ -441,4 +419,3 @@ pytest tests/ -v
 
 *The essence of Dowsing: it guides you to places you haven't looked yet — it does not predestine the outcome.*
 
-</div>
