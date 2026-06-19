@@ -112,13 +112,35 @@ The script outputs a structured JSON **SearchReport** containing `primary_direct
 
 ```mermaid
 flowchart TD
-    input["Input<br/>Time / Date / Numbers + Item name + Context"]
-    calc["shiwu_calc.py (Deterministic)<br/>1. Cast hexagram (本卦) from input<br/>2. Determine Ti (体 = seeker) & Yong (用 = item)<br/>3. Analyze Five Elements (五行) relationship<br/>4. Compute mutual hexagram (互卦) — transition path<br/>5. Compute transformed hexagram (变卦) — movement<br/>6. Extract directions + context-aware scenes<br/>7. Compute combined directions (e.g. 南+西=西南)<br/>8. Generate findability assessment<br/>9. Build action advice"]
-    report["SearchReport (JSON)<br/>• primary_direction — cardinal bearing to search<br/>• locations[] — ranked search zones<br/>• findability — tendency + reasoning<br/>• moved — movement inference<br/>• action_advice — concrete next steps"]
-    llm["LLM (Claude / ChatGPT / Gemini)<br/>Renders JSON into a human-readable search report<br/>using reference materials for qualitative interpretation"]
+    input["Input<br/>Time · Item · Context"]
 
-    input --> calc --> report --> llm
+    subgraph engine["shiwu_calc.py"]
+        c1["① Cast hexagram<br/>Ti & Yong"]
+        c2["② Analyze<br/>Five Elements · Mutual · Transform"]
+        c3["③ Build clues<br/>Direction · Scenes · Findability"]
+        c1 --> c2 --> c3
+    end
+
+    report["SearchReport JSON"]
+    llm["LLM<br/>Claude · ChatGPT · Gemini"]
+
+    input --> c1
+    c3 --> report --> llm
 ```
+
+**Engine steps (inside `shiwu_calc.py`):**
+
+1. Cast hexagram (本卦) from input
+2. Determine Ti (体 = seeker) & Yong (用 = item)
+3. Analyze Five Elements (五行) relationship
+4. Compute mutual hexagram (互卦) — transition path
+5. Compute transformed hexagram (变卦) — movement
+6. Extract directions + context-aware scenes
+7. Compute combined directions (e.g. 南+西=西南)
+8. Generate findability assessment
+9. Build action advice
+
+**SearchReport fields:** `primary_direction` · `locations[]` · `findability` · `moved` · `action_advice`
 
 ### Project Structure
 
@@ -303,13 +325,35 @@ python scripts/shiwu_calc.py time --item 猫 --context pet
 
 ```mermaid
 flowchart TD
-    input["输入<br/>时间/日期/数字 + 物品名 + 语境"]
-    calc["shiwu_calc.py（确定性引擎）<br/>1. 据输入起本卦<br/>2. 定体（失主）用（失物）<br/>3. 分析五行生克关系<br/>4. 推互卦 — 中间经过路径<br/>5. 推变卦 — 是否移动<br/>6. 提取方位 + 依语境取场景类象<br/>7. 计算复合方向（如南+西=西南）<br/>8. 生成寻回倾向判断<br/>9. 构建行动建议"]
-    report["SearchReport (JSON)<br/>• primary_direction — 首要搜索方位<br/>• locations[] — 排序搜索区域<br/>• findability — 倾向 + 理由<br/>• moved — 移动推断<br/>• action_advice — 具体行动建议"]
-    llm["LLM（Claude / ChatGPT / Gemini）<br/>将 JSON 渲染为用户可读的搜寻报告<br/>结合 references/ 中的资料进行定性解读"]
+    input["输入<br/>时间 · 物品 · 语境"]
 
-    input --> calc --> report --> llm
+    subgraph engine["shiwu_calc.py"]
+        c1["① 起本卦<br/>定体用"]
+        c2["② 析生克<br/>互卦 · 变卦"]
+        c3["③ 取线索<br/>方位 · 场景 · 建议"]
+        c1 --> c2 --> c3
+    end
+
+    report["SearchReport JSON"]
+    llm["LLM<br/>Claude · ChatGPT · Gemini"]
+
+    input --> c1
+    c3 --> report --> llm
 ```
+
+**引擎步骤（`shiwu_calc.py` 内部）：**
+
+1. 据输入起本卦
+2. 定体（失主）用（失物）
+3. 分析五行生克关系
+4. 推互卦 — 中间经过路径
+5. 推变卦 — 是否移动
+6. 提取方位 + 依语境取场景类象
+7. 计算复合方向（如南+西=西南）
+8. 生成寻回倾向判断
+9. 构建行动建议
+
+**SearchReport 字段：** `primary_direction` · `locations[]` · `findability` · `moved` · `action_advice`
 
 ### 项目结构
 
