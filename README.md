@@ -5,7 +5,7 @@
 [Agent Skill](https://github.com/anthropics/skills)
 [Claude Code]()
 [Cursor Skill]()
-[License: MIT](https://opensource.org/licenses/MIT)
+[License: MIT](./LICENSE)
 
 **A structured search heuristic — not magic, but a systematic way to break through search blind spots.**
 
@@ -25,218 +25,7 @@ Or in Claude Code: `Please install this skill: https://github.com/raphaelxie/dow
 
 **Triggers:** `失物占` · `找东西` · `lost item` · `I lost my passport` · `我的 XX 丢了`
 
----
-
-## English
-
-### Overview
-
-**Dowsing** (失物占, *Lost Item Divination*) is a deterministic divination tool based on [Meihua Yishu](https://en.wikipedia.org/wiki/Plum_Blossom_Yijing) (梅花易数, Plum Blossom Yi-ology). It helps you search for lost items by providing:
-
-- **Directional clues** — the most stable cross-context signal, derived from Hou Tian Bagua (后天八卦) bearings
-- **Context-aware scene suggestions** — tailored to where the item was lost (home, public, transit, or a lost pet)
-- **Findability assessment** — via Ti-Yong (体用) Five Elements analysis
-- **Ranked search checklist** — prioritized locations to check, not a single guess
-- **Movement inference** — whether the item has likely been moved, and where to
-
-> **It is NOT fortune-telling.** It is a **structured search heuristic**: a systematic way to guide you toward places you haven't checked yet. Think of it as a compass for your search, not a crystal ball.
-
-### Why Context Matters
-
-In Meihua Yishu, the same hexagram maps to different real-world objects depending on the environment. A Kan (坎 ☵) hexagram means "near water" — in a home that suggests the washing machine or bathroom; in a public space it suggests a river, drain, or underground area. Without context, the interpretation is useless or misleading. **Direction**, however, stays constant across all contexts, which is why it is elevated to the primary clue.
-
-### Installation
-
-#### As a Claude Code Skill (Recommended)
-
-```bash
-git clone https://github.com/raphaelxie/dowsing.git ~/.claude/skills/dowsing
-```
-
-Or in Claude Code, simply say:
-
-```
-Please install this skill: https://github.com/raphaelxie/dowsing
-```
-
-Once installed, trigger phrases like "我的护照丢了" (I lost my passport), "失物占", "找东西", or "lost item" will activate the skill.
-
-#### As a ChatGPT Custom GPT
-
-1. Go to [https://chatgpt.com/gpts/editor](https://chatgpt.com/gpts/editor) and create a new GPT
-2. Copy the full text of `SKILL.md` into **Instructions** (must be < 8000 characters)
-3. Upload all files under `references/` as **Knowledge**
-4. Suggested conversation starters: "我的东西丢了，帮我占一卦" / "失物占"
-
-#### As a Google Gemini Gem
-
-1. Go to [https://gemini.google.com/gems](https://gemini.google.com/gems) and create a new Gem
-2. Copy `SKILL.md` into Instructions
-3. Upload `references/` as Knowledge files
-4. Suggested prompts: "失物占" / "帮我找丢失的东西"
-
-#### CLI / Library Usage
-
-```bash
-# Install dependencies
-pip install -r requirements.txt
-
-# Cast by current time
-python scripts/shiwu_calc.py time --item "passport" --context home
-
-# Cast by Gregorian date
-python scripts/shiwu_calc.py gregorian 2026 6 17 14 --item "charging cable" --context public
-
-# Cast by numbers (2–3 numbers you have in mind)
-python scripts/shiwu_calc.py num 1 6 1 --item "gold bracelet" --context home
-
-# Lost pet
-python scripts/shiwu_calc.py time --item "cat" --context pet
-```
-
-The script outputs a structured JSON **SearchReport** containing `primary_direction`, `locations`, `findability`, `action_advice`, and more.
-
-### Context Values
-
-
-| Value     | Label   | When to Use                                               |
-| --------- | ------- | --------------------------------------------------------- |
-| `home`    | 居家      | Item lost at home                                         |
-| `public`  | 公共场所/户外 | Item lost in a library, office, mall, street, etc.        |
-| `transit` | 交通工具    | Item lost on a plane, bus, train, car, etc.               |
-| `pet`     | 走失生物    | A lost cat, dog, or other pet                             |
-| `general` | 通用      | Unknown context — direction-only interpretation (default) |
-
-
-### How It Works
-
-```mermaid
-flowchart TD
-    input["Input<br/>Time · Item · Context"]
-
-    subgraph engine["shiwu_calc.py"]
-        c1["① Cast hexagram<br/>Ti & Yong"]
-        c2["② Analyze<br/>Five Elements · Mutual · Transform"]
-        c3["③ Build clues<br/>Direction · Scenes · Findability"]
-        c1 --> c2 --> c3
-    end
-
-    report["SearchReport JSON"]
-    llm["LLM<br/>Claude · ChatGPT · Gemini"]
-
-    input --> c1
-    c3 --> report --> llm
-```
-
-**Engine steps (inside `shiwu_calc.py`):**
-
-1. Cast hexagram (本卦) from input
-2. Determine Ti (体 = seeker) & Yong (用 = item)
-3. Analyze Five Elements (五行) relationship
-4. Compute mutual hexagram (互卦) — transition path
-5. Compute transformed hexagram (变卦) — movement
-6. Extract directions + context-aware scenes
-7. Compute combined directions (e.g. 南+西=西南)
-8. Generate findability assessment
-9. Build action advice
-
-**SearchReport fields:** `primary_direction` · `locations[]` · `findability` · `moved` · `action_advice`
-
-### Project Structure
-
-```
-dowsing/
-├── SKILL.md                      # AI Skill main document
-├── README.md                     # This file
-├── requirements.txt              # Python dependencies (lunardate)
-├── scripts/
-│   └── shiwu_calc.py             # Deterministic divination engine
-├── references/
-│   ├── bagua-shiwu.md            # Bagua directions + lost-item imagery by context
-│   ├── tiyong-shiwu.md           # Ti-Yong Five Elements analysis for lost items
-│   └── cases.md                  # Verified case studies
-└── tests/
-    └── test_shiwu.py             # Regression tests
-```
-
-### The Eight Trigrams (Bagua) at a Glance
-
-
-| #   | Name   | Symbol | Element   | Direction | Key Traits                            |
-| --- | ------ | ------ | --------- | --------- | ------------------------------------- |
-| 1   | 乾 Qián | ☰      | Metal (金) | NW 西北     | Round, metallic, high places          |
-| 2   | 兌 Duì  | ☱      | Metal (金) | W 西       | Gaps, small metal items, dining areas |
-| 3   | 離 Lí   | ☲      | Fire (火)  | S 南       | Bright, documents, electronics        |
-| 4   | 震 Zhèn | ☳      | Wood (木)  | E 东       | Wood, movement, noisy areas           |
-| 5   | 巽 Xùn  | ☴      | Wood (木)  | SE 东南     | Fabric, gaps, crevices, vents         |
-| 6   | 坎 Kǎn  | ☵      | Water (水) | N 北       | Water, hidden recesses, washing       |
-| 7   | 艮 Gèn  | ☶      | Earth (土) | NE 东北     | Corners, still places, thresholds     |
-| 8   | 坤 Kūn  | ☷      | Earth (土) | SW 西南     | Low places, fabric, bags, pockets     |
-
-
-### Findability (Ti-Yong Analysis)
-
-
-| Relationship  | Tendency       | Distance | Meaning                            |
-| ------------- | -------------- | -------- | ---------------------------------- |
-| 用生体 Yong → Ti | Easy (易得)      | Near     | Item "comes to you"; likely nearby |
-| 体用比和 Harmony  | Easy (易得)      | Near     | Same element; near original spot   |
-| 体克用 Ti → Yong | Possible (可得)  | Medium   | Requires effort but recoverable    |
-| 用克体 Yong → Ti | Difficult (难寻) | Far      | May have left your possession      |
-| 体生用 Ti → Yong | Hard (难得)      | Far      | Draining; unlikely to recover      |
-
-
-### Running Tests
-
-```bash
-pip install -r requirements.txt
-pip install pytest
-pytest tests/ -v
-```
-
-### Verified Cases
-
-
-| Case                            | Context | Key Insight                                                         |
-| ------------------------------- | ------- | ------------------------------------------------------------------- |
-| Gold bracelet → washing machine | Home    | Kan hexagram (坎 ☵) = "in water" → found in washing machine          |
-| Charging cable at library       | Public  | Gen hexagram (艮 ☶) = "lost & found" in public context               |
-| Power bank on airplane          | Transit | Context matters — transit scenes differ from home                   |
-| SIM card in bag pocket          | Home    | Combined direction: Li (S) + Dui (W) = SW (Kun), found in SW pocket |
-| Lost cat                        | Pet     | Direction + animal imagery + self-return analysis                   |
-
-
-See `references/cases.md` for full details.
-
-### Design Principles
-
-1. **Reason over image (理大于象)** — Context determines scene interpretation; never default to "at home"
-2. **Direction first** — Bagua bearing is the most stable cross-context clue; report it before scenes
-3. **Humble language** — Use "tendency", "likely", "suggest checking" — never "certainly" or "absolutely"
-4. **No timing predictions** — MVP does not infer when you will find the item
-5. **Always output next steps** — Every report must include concrete action advice
-
-### Ethics
-
-- Present both favorable and unfavorable outcomes; do not sugarcoat
-- Do not predict death, extreme misfortune, or catastrophic loss
-- Do not replace law enforcement — suggest reporting valuable lost items to police
-- Emphasize the **reference nature** of results; encourage users to combine with practical knowledge
-- Be especially gentle with emotionally vulnerable users; reinforce the "search heuristic" framing
-- This is a search compass, not destiny — it guides you to places you haven't looked yet
-
-### Contributing
-
-Contributions are welcome — especially:
-
-- New verified case studies with ground truth
-- Improved context-dependent imagery (scene suggestions)
-- Language translations of reference materials
-- Bug reports and test coverage improvements
-
-### License
-
-[MIT](https://opensource.org/licenses/MIT)
+[中文](#中文) · [English](#english)
 
 ---
 
@@ -449,11 +238,222 @@ pytest tests/ -v
 
 ### 许可
 
-[MIT](https://opensource.org/licenses/MIT)
+[MIT](./LICENSE)
 
 ---
 
+## English
 
+### Overview
+
+**Dowsing** (失物占, *Lost Item Divination*) is a deterministic divination tool based on [Meihua Yishu](https://en.wikipedia.org/wiki/Plum_Blossom_Yijing) (梅花易数, Plum Blossom Yi-ology). It helps you search for lost items by providing:
+
+- **Directional clues** — the most stable cross-context signal, derived from Hou Tian Bagua (后天八卦) bearings
+- **Context-aware scene suggestions** — tailored to where the item was lost (home, public, transit, or a lost pet)
+- **Findability assessment** — via Ti-Yong (体用) Five Elements analysis
+- **Ranked search checklist** — prioritized locations to check, not a single guess
+- **Movement inference** — whether the item has likely been moved, and where to
+
+> **It is NOT fortune-telling.** It is a **structured search heuristic**: a systematic way to guide you toward places you haven't checked yet. Think of it as a compass for your search, not a crystal ball.
+
+### Why Context Matters
+
+In Meihua Yishu, the same hexagram maps to different real-world objects depending on the environment. A Kan (坎 ☵) hexagram means "near water" — in a home that suggests the washing machine or bathroom; in a public space it suggests a river, drain, or underground area. Without context, the interpretation is useless or misleading. **Direction**, however, stays constant across all contexts, which is why it is elevated to the primary clue.
+
+### Installation
+
+#### As a Claude Code Skill (Recommended)
+
+```bash
+git clone https://github.com/raphaelxie/dowsing.git ~/.claude/skills/dowsing
+```
+
+Or in Claude Code, simply say:
+
+```
+Please install this skill: https://github.com/raphaelxie/dowsing
+```
+
+Once installed, trigger phrases like "我的护照丢了" (I lost my passport), "失物占", "找东西", or "lost item" will activate the skill.
+
+#### As a ChatGPT Custom GPT
+
+1. Go to [https://chatgpt.com/gpts/editor](https://chatgpt.com/gpts/editor) and create a new GPT
+2. Copy the full text of `SKILL.md` into **Instructions** (must be < 8000 characters)
+3. Upload all files under `references/` as **Knowledge**
+4. Suggested conversation starters: "我的东西丢了，帮我占一卦" / "失物占"
+
+#### As a Google Gemini Gem
+
+1. Go to [https://gemini.google.com/gems](https://gemini.google.com/gems) and create a new Gem
+2. Copy `SKILL.md` into Instructions
+3. Upload `references/` as Knowledge files
+4. Suggested prompts: "失物占" / "帮我找丢失的东西"
+
+#### CLI / Library Usage
+
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Cast by current time
+python scripts/shiwu_calc.py time --item "passport" --context home
+
+# Cast by Gregorian date
+python scripts/shiwu_calc.py gregorian 2026 6 17 14 --item "charging cable" --context public
+
+# Cast by numbers (2–3 numbers you have in mind)
+python scripts/shiwu_calc.py num 1 6 1 --item "gold bracelet" --context home
+
+# Lost pet
+python scripts/shiwu_calc.py time --item "cat" --context pet
+```
+
+The script outputs a structured JSON **SearchReport** containing `primary_direction`, `locations`, `findability`, `action_advice`, and more.
+
+### Context Values
+
+
+| Value     | Label   | When to Use                                               |
+| --------- | ------- | --------------------------------------------------------- |
+| `home`    | 居家      | Item lost at home                                         |
+| `public`  | 公共场所/户外 | Item lost in a library, office, mall, street, etc.        |
+| `transit` | 交通工具    | Item lost on a plane, bus, train, car, etc.               |
+| `pet`     | 走失生物    | A lost cat, dog, or other pet                             |
+| `general` | 通用      | Unknown context — direction-only interpretation (default) |
+
+
+### How It Works
+
+```mermaid
+flowchart TD
+    input["Input<br/>Time · Item · Context"]
+
+    subgraph engine["shiwu_calc.py"]
+        c1["① Cast hexagram<br/>Ti & Yong"]
+        c2["② Analyze<br/>Five Elements · Mutual · Transform"]
+        c3["③ Build clues<br/>Direction · Scenes · Findability"]
+        c1 --> c2 --> c3
+    end
+
+    report["SearchReport JSON"]
+    llm["LLM<br/>Claude · ChatGPT · Gemini"]
+
+    input --> c1
+    c3 --> report --> llm
+```
+
+**Engine steps (inside `shiwu_calc.py`):**
+
+1. Cast hexagram (本卦) from input
+2. Determine Ti (体 = seeker) & Yong (用 = item)
+3. Analyze Five Elements (五行) relationship
+4. Compute mutual hexagram (互卦) — transition path
+5. Compute transformed hexagram (变卦) — movement
+6. Extract directions + context-aware scenes
+7. Compute combined directions (e.g. 南+西=西南)
+8. Generate findability assessment
+9. Build action advice
+
+**SearchReport fields:** `primary_direction` · `locations[]` · `findability` · `moved` · `action_advice`
+
+### Project Structure
+
+```
+dowsing/
+├── SKILL.md                      # AI Skill main document
+├── README.md                     # This file
+├── requirements.txt              # Python dependencies (lunardate)
+├── scripts/
+│   └── shiwu_calc.py             # Deterministic divination engine
+├── references/
+│   ├── bagua-shiwu.md            # Bagua directions + lost-item imagery by context
+│   ├── tiyong-shiwu.md           # Ti-Yong Five Elements analysis for lost items
+│   └── cases.md                  # Verified case studies
+└── tests/
+    └── test_shiwu.py             # Regression tests
+```
+
+### The Eight Trigrams (Bagua) at a Glance
+
+
+| #   | Name   | Symbol | Element   | Direction | Key Traits                            |
+| --- | ------ | ------ | --------- | --------- | ------------------------------------- |
+| 1   | 乾 Qián | ☰      | Metal (金) | NW 西北     | Round, metallic, high places          |
+| 2   | 兌 Duì  | ☱      | Metal (金) | W 西       | Gaps, small metal items, dining areas |
+| 3   | 離 Lí   | ☲      | Fire (火)  | S 南       | Bright, documents, electronics        |
+| 4   | 震 Zhèn | ☳      | Wood (木)  | E 东       | Wood, movement, noisy areas           |
+| 5   | 巽 Xùn  | ☴      | Wood (木)  | SE 东南     | Fabric, gaps, crevices, vents         |
+| 6   | 坎 Kǎn  | ☵      | Water (水) | N 北       | Water, hidden recesses, washing       |
+| 7   | 艮 Gèn  | ☶      | Earth (土) | NE 东北     | Corners, still places, thresholds     |
+| 8   | 坤 Kūn  | ☷      | Earth (土) | SW 西南     | Low places, fabric, bags, pockets     |
+
+
+### Findability (Ti-Yong Analysis)
+
+
+| Relationship  | Tendency       | Distance | Meaning                            |
+| ------------- | -------------- | -------- | ---------------------------------- |
+| 用生体 Yong → Ti | Easy (易得)      | Near     | Item "comes to you"; likely nearby |
+| 体用比和 Harmony  | Easy (易得)      | Near     | Same element; near original spot   |
+| 体克用 Ti → Yong | Possible (可得)  | Medium   | Requires effort but recoverable    |
+| 用克体 Yong → Ti | Difficult (难寻) | Far      | May have left your possession      |
+| 体生用 Ti → Yong | Hard (难得)      | Far      | Draining; unlikely to recover      |
+
+
+### Running Tests
+
+```bash
+pip install -r requirements.txt
+pip install pytest
+pytest tests/ -v
+```
+
+### Verified Cases
+
+
+| Case                            | Context | Key Insight                                                         |
+| ------------------------------- | ------- | ------------------------------------------------------------------- |
+| Gold bracelet → washing machine | Home    | Kan hexagram (坎 ☵) = "in water" → found in washing machine          |
+| Charging cable at library       | Public  | Gen hexagram (艮 ☶) = "lost & found" in public context               |
+| Power bank on airplane          | Transit | Context matters — transit scenes differ from home                   |
+| SIM card in bag pocket          | Home    | Combined direction: Li (S) + Dui (W) = SW (Kun), found in SW pocket |
+| Lost cat                        | Pet     | Direction + animal imagery + self-return analysis                   |
+
+
+See `references/cases.md` for full details.
+
+### Design Principles
+
+1. **Reason over image (理大于象)** — Context determines scene interpretation; never default to "at home"
+2. **Direction first** — Bagua bearing is the most stable cross-context clue; report it before scenes
+3. **Humble language** — Use "tendency", "likely", "suggest checking" — never "certainly" or "absolutely"
+4. **No timing predictions** — MVP does not infer when you will find the item
+5. **Always output next steps** — Every report must include concrete action advice
+
+### Ethics
+
+- Present both favorable and unfavorable outcomes; do not sugarcoat
+- Do not predict death, extreme misfortune, or catastrophic loss
+- Do not replace law enforcement — suggest reporting valuable lost items to police
+- Emphasize the **reference nature** of results; encourage users to combine with practical knowledge
+- Be especially gentle with emotionally vulnerable users; reinforce the "search heuristic" framing
+- This is a search compass, not destiny — it guides you to places you haven't looked yet
+
+### Contributing
+
+Contributions are welcome — especially:
+
+- New verified case studies with ground truth
+- Improved context-dependent imagery (scene suggestions)
+- Language translations of reference materials
+- Bug reports and test coverage improvements
+
+### License
+
+[MIT](./LICENSE)
+
+---
 
 **「穷则变，变则通，通则久。」**
 
