@@ -20,3 +20,6 @@ Thumbs.db
 
 # Claude (keep .claude/settings.local.json out of repo)
 .claude/
+
+# Local tooling
+.agentskill-cli/

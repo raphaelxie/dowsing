@@ -13,12 +13,32 @@
 
 ## Quick Install · 一键安装
 
+**Repo:** https://github.com/raphaelxie/dowsing
+
+### Option A — One command (Claude + Cursor)
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/raphaelxie/dowsing/main/scripts/install.sh | bash
+```
+
+Or from a local clone:
+
+```bash
+bash scripts/install.sh all    # both agents
+bash scripts/install.sh claude # Claude Code only
+bash scripts/install.sh cursor # Cursor only
+```
+
+### Option B — Manual clone
+
 ```bash
 # Claude Code
 git clone https://github.com/raphaelxie/dowsing.git ~/.claude/skills/dowsing
+pip install -r ~/.claude/skills/dowsing/requirements.txt
 
 # Cursor
 git clone https://github.com/raphaelxie/dowsing.git ~/.cursor/skills/dowsing
+pip install -r ~/.cursor/skills/dowsing/requirements.txt
 ```
 
 Or in Claude Code: `Please install this skill: https://github.com/raphaelxie/dowsing`
@@ -49,11 +69,13 @@ Or in Claude Code: `Please install this skill: https://github.com/raphaelxie/dow
 
 ### 安装
 
-#### 作为 Claude Code Skill（推荐）
+#### Claude Code / Cursor（推荐）
 
 ```bash
-git clone https://github.com/raphaelxie/dowsing.git ~/.claude/skills/dowsing
+curl -fsSL https://raw.githubusercontent.com/raphaelxie/dowsing/main/scripts/install.sh | bash
 ```
+
+或手动 clone 到对应目录，并安装 Python 依赖（见 README 顶部 Quick Install）。
 
 或在 Claude Code 中直接说：
 
@@ -262,11 +284,13 @@ In Meihua Yishu, the same hexagram maps to different real-world objects dependin
 
 ### Installation
 
-#### As a Claude Code Skill (Recommended)
+#### Claude Code / Cursor (Recommended)
 
 ```bash
-git clone https://github.com/raphaelxie/dowsing.git ~/.claude/skills/dowsing
+curl -fsSL https://raw.githubusercontent.com/raphaelxie/dowsing/main/scripts/install.sh | bash
 ```
+
+Or clone manually — see **Quick Install** at the top of this README.
 
 Or in Claude Code, simply say:
 
