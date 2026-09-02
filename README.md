@@ -2,20 +2,32 @@
 
 > **AI Agent Skill** — Lost-item search powered by [Meihua Yishu](https://en.wikipedia.org/wiki/Plum_Blossom_Yijing) (梅花易数). Works with **Claude Code**, **Cursor**, **ChatGPT** & **Gemini**.
 
-[Agent Skill](https://github.com/anthropics/skills)
-[Claude Code]()
-[Cursor Skill]()
-[License: MIT](./LICENSE)
+[![Agent Skill](https://img.shields.io/badge/Agent%20Skill-anthropics%2Fskills-blueviolet)](https://github.com/anthropics/skills)
+[![Claude Code](https://img.shields.io/badge/Claude%20Code-compatible-D97757?logo=anthropic&logoColor=white)](https://github.com/raphaelxie/dowsing#claude-code--cursor-推荐)
+[![Cursor Skill](https://img.shields.io/badge/Cursor-compatible-000000?logo=cursor&logoColor=white)](https://github.com/raphaelxie/dowsing#claude-code--cursor-推荐)
+[![skills.sh](https://img.shields.io/badge/skills.sh-npx%20skills%20add-0A84FF)](https://skills.sh/raphaelxie/dowsing)
+[![GitHub stars](https://img.shields.io/github/stars/raphaelxie/dowsing?style=social)](https://github.com/raphaelxie/dowsing/stargazers)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
 **A structured search heuristic — not magic, but a systematic way to break through search blind spots.**
 
 **梅花易数失物占 · 结构化搜索启发器 — 帮你打破搜寻盲区，而非预定命运。**
 
+![Dowsing demo — deterministic search report for a lost key and a missing cat](./assets/demo.gif)
+
 ## Quick Install · 一键安装
 
 **Repo:** https://github.com/raphaelxie/dowsing
 
-### Option A — One command (Claude + Cursor)
+### Option A — skills.sh (any of 17+ agent platforms)
+
+```bash
+npx skills add raphaelxie/dowsing
+```
+
+Works with Claude Code, Cursor, and every agent supported by the [skills.sh](https://skills.sh) registry. Run `npx skills update` later to pull updates.
+
+### Option B — One command (Claude + Cursor)
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/raphaelxie/dowsing/main/scripts/install.sh | bash
@@ -29,7 +41,7 @@ bash scripts/install.sh claude # Claude Code only
 bash scripts/install.sh cursor # Cursor only
 ```
 
-### Option B — Manual clone
+### Option C — Manual clone
 
 ```bash
 # Claude Code
@@ -69,7 +81,13 @@ Or in Claude Code: `Please install this skill: https://github.com/raphaelxie/dow
 
 ### 安装
 
-#### Claude Code / Cursor（推荐）
+#### skills.sh（支持 Claude Code / Cursor 等 17+ 平台，推荐）
+
+```bash
+npx skills add raphaelxie/dowsing
+```
+
+#### Claude Code / Cursor 一键安装
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/raphaelxie/dowsing/main/scripts/install.sh | bash
